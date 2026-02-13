@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Financeiro</title>
+
+<style>
+:root {
+    --primary: #3b82f6;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+    --bg: #f3f4f6;
+    --dark: #1f2937;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    width: 420px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dashboard {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    text-align: center;
+    background: #f9fafb;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.money.plus { color: var(--success); }
+.money.minus { color: var(--danger); }
+
+.list {
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.list li.plus { border-right: 5px solid var(--success); }
+.list li.minus { border-right: 5px solid var(--danger); }
+
+.delete-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-control {
+    margin-bottom: 12px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>💰 Minhas Finanças</h2>
+
+<div class="dashboard">
+    <div class="card">
+        <h4>Receitas</h4>
+        <p id="money-plus" class="money plus">R$0,00</p>
+    </div>
+    <div class="card">
+        <h4>Despesas</h4>
+        <p id="money-minus" class="money minus">R$0,00</p>
+    </div>
+    <div class="card">
+        <h4>Saldo</h4>
+        <p id="balance">R$0,00</p>
+    </div>
+</div>
+
+<h3>Histórico</h3>
+<ul id="list" class="list"></ul>
+
+<h3>Nova Transação</h3>
+<form id="form">
+
+<div class="form-control">
+<label>Descrição</label>
+<input type="text" id="text" required>
+</div>
+
+<div class="form-control">
+<label>Valor</label>
+<input type="number" id="amount" step="0.01" required>
+</div>
+
+<div class="form-control">
+<label>Tipo</label>
+<select id="type">
+<option value="receita">Receita</option>
+<option value="despesa">Despesa</option>
+</select>
+</div>
+
+<button>Adicionar</button>
+
+</form>
+</div>
+
+<script>
+
+/* =============================
+   CONFIG INICIAL
+============================= */
+
+const balance = document.getElementById('balance');
+const moneyPlus = document.getElementById('money-plus');
+const moneyMinus = document.getElementById('money-minus');
+const list = document.getElementById('list');
+
+const form = document.getElementById('form');
+const text = document.getElementById('text');
+const amount = document.getElementById('amount');
+const type = document.getElementById('type');
+
+let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+
+/* =============================
+   UTIL
+============================= */
+
+function generateID() {
+    return Date.now() + Math.random();
+}
+
+function formatMoney(value) {
+    return value.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
+
+
+/* =============================
+   CRUD DOM
+============================= */
+
+function addTransactionDOM(transaction) {
+
+    const li = document.createElement('li');
+
+    li.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
+
+    li.innerHTML = `
+        ${transaction.text}
+        <span>${formatMoney(transaction.amount)}</span>
+        <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
+    `;
+
+    list.appendChild(li);
+}
+
+
+function updateValues() {
+
+    const amounts = transactions.map(t => t.amount);
+
+    const total = amounts.reduce((acc, v) => acc + v, 0);
+    const income = amounts.filter(v => v > 0).reduce((acc,v) => acc + v, 0);
+    const expense = amounts.filter(v => v < 0).reduce((acc,v) => acc + v, 0);
+
+    balance.innerText = formatMoney(total);
+    moneyPlus.innerText = formatMoney(income);
+    moneyMinus.innerText = formatMoney(expense);
+}
+
+
+function removeTransaction(id) {
+    transactions = transactions.filter(t => t.id !== id);
+    saveStorage();
+    init();
+}
+
+
+function saveStorage() {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
+
+/* =============================
+   EVENTOS
+============================= */
+
+form.addEventListener('submit', e => {
+
+    e.preventDefault();
+
+    if(text.value.trim() === '' || amount.value === '') return;
+
+    const value = Number(amount.value);
+
+    const finalValue = type.value === 'despesa' ? -Math.abs(value) : Math.abs(value);
+
+    const transaction = {
+        id: generateID(),
+        text: text.value,
+        amount: finalValue
+    };
+
+    transactions.push(transaction);
+
+    saveStorage();
+    init();
+
+    form.reset();
+});
+
+
+/* =============================
+   INIT
+============================= */
+
+function init() {
+
+    list.innerHTML = '';
+
+    transactions.forEach(addTransactionDOM);
+
+    updateValues();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
