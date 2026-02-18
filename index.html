@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Financeiro com Temas</title>
+    <title>Simulador Financeiro + Metas</title>
     <style>
-        /* --- CSS --- */
         :root {
             --primary: #3b82f6;
             --success: #2ecc71;
@@ -15,188 +14,195 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
 
-        /* O fundo padrão será alterado pelo JS */
         body { 
             background-color: #f3f4f6; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            padding: 20px; 
-            min-height: 100vh;
-            transition: background-color 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 20px; min-height: 100vh; transition: background 0.3s;
         }
 
-        .container { background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
 
-        h2 { text-align: center; margin-bottom: 20px; color: var(--dark); }
+        h2, h3 { color: var(--dark); margin-bottom: 15px; text-align: center; }
 
-        /* Seletor de Cores */
-        .theme-selector {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.8);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        #bg-color-picker { cursor: pointer; border: none; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; }
+        /* Temas */
+        .theme-selector { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 15px; border-radius: 20px; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         /* Dashboard */
         .dashboard { display: flex; justify-content: space-between; margin-bottom: 25px; gap: 10px; }
-        .card { flex: 1; text-align: center; padding: 15px; border-radius: 8px; background: #fff; border: 1px solid #eee; }
-        .card h4 { font-size: 11px; text-transform: uppercase; color: #777; margin-bottom: 5px; }
-        .card p { font-size: 16px; font-weight: bold; }
-        
-        .money-plus { color: var(--success); }
-        .money-minus { color: var(--danger); }
+        .card { flex: 1; text-align: center; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .card h4 { font-size: 11px; text-transform: uppercase; color: #777; }
+        .money-plus { color: var(--success); font-weight: bold; }
+        .money-minus { color: var(--danger); font-weight: bold; }
 
-        /* Lista */
-        h3 { border-bottom: 2px solid #f3f4f6; padding-bottom: 8px; margin: 20px 0 10px; font-size: 18px; }
-        .list { list-style-type: none; margin-bottom: 30px; max-height: 200px; overflow-y: auto; }
-        .list li { background-color: #fff; border: 1px solid #f1f1f1; border-radius: 6px; display: flex; justify-content: space-between; padding: 12px; margin-bottom: 8px; }
-        .list li.plus { border-left: 6px solid var(--success); }
-        .list li.minus { border-left: 6px solid var(--danger); }
-        
-        .delete-btn { cursor: pointer; background: var(--danger); color: white; border: 0; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        /* Listas */
+        .list { list-style: none; margin-bottom: 20px; max-height: 150px; overflow-y: auto; }
+        .list li { background: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-bottom: 5px; display: flex; justify-content: space-between; border-radius: 5px; }
+        .list li.plus { border-left: 5px solid var(--success); }
+        .list li.minus { border-left: 5px solid var(--danger); }
 
-        /* Formulário */
-        .form-control { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
-        input, select { border: 1px solid #ddd; border-radius: 6px; font-size: 15px; padding: 12px; width: 100%; outline: none; }
-        
-        .btn { cursor: pointer; background: var(--primary); color: white; border: 0; font-size: 16px; margin-top: 10px; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; }
+        /* Metas */
+        .goal-item { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .goal-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
+        .progress-bar { background: #eee; border-radius: 10px; height: 12px; width: 100%; overflow: hidden; }
+        .progress-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s; }
+
+        /* Forms */
+        .form-group { margin-bottom: 10px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: opacity 0.2s; }
+        .btn-add { background: var(--primary); margin-top: 5px; }
+        .btn-goal { background: var(--dark); margin-top: 5px; }
+        .btn:hover { opacity: 0.8; }
+        .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-weight: bold; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <!-- Seletor de Cor de Fundo -->
     <div class="theme-selector">
-        <label for="bg-color-picker">🎨 Mudar Fundo:</label>
-        <input type="color" id="bg-color-picker" value="#f3f4f6">
+        <label>🎨 Cor de Fundo:</label>
+        <input type="color" id="bg-picker" value="#f3f4f6">
     </div>
 
     <div class="container">
-        <h2>💰 Simulador Pro</h2>
-
+        <h2>💰 Simulador Financeiro</h2>
+        
         <div class="dashboard">
-            <div class="card">
-                <h4>Entradas</h4>
-                <p id="money-plus" class="money-plus">+ R$ 0,00</p>
-            </div>
-            <div class="card">
-                <h4>Saídas</h4>
-                <p id="money-minus" class="money-minus">- R$ 0,00</p>
-            </div>
-            <div class="card">
-                <h4>Saldo</h4>
-                <p id="balance">R$ 0,00</p>
-            </div>
+            <div class="card"><h4>Entradas</h4><p id="inc" class="money-plus">R$ 0</p></div>
+            <div class="card"><h4>Saídas</h4><p id="exp" class="money-minus">R$ 0</p></div>
+            <div class="card"><h4>Saldo</h4><p id="bal">R$ 0</p></div>
         </div>
 
-        <h3>Histórico</h3>
-        <ul id="list" class="list"></ul>
+        <div class="grid">
+            <!-- Coluna 1: Transações -->
+            <div>
+                <h3>Transações</h3>
+                <ul id="trans-list" class="list"></ul>
+                <form id="trans-form">
+                    <input type="text" id="t-text" placeholder="Descrição" required style="margin-bottom:5px">
+                    <input type="number" id="t-amount" placeholder="Valor" step="0.01" required style="margin-bottom:5px">
+                    <select id="t-type" style="margin-bottom:5px">
+                        <option value="receita">Receita (+)</option>
+                        <option value="despesa">Despesa (-)</option>
+                    </select>
+                    <button class="btn btn-add">Adicionar</button>
+                </form>
+            </div>
 
-        <h3>Nova Transação</h3>
-        <form id="form">
-            <div class="form-control">
-                <label>Descrição</label>
-                <input type="text" id="text" placeholder="Ex: Salário, Pizza..." required />
+            <!-- Coluna 2: Metas -->
+            <div>
+                <h3>🎯 Metas</h3>
+                <div id="goals-container"></div>
+                <form id="goal-form" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <input type="text" id="g-name" placeholder="Nome da Meta (Ex: Carro)" required style="margin-bottom:5px">
+                    <input type="number" id="g-target" placeholder="Valor Alvo (R$)" required style="margin-bottom:5px">
+                    <button class="btn btn-goal">Criar Meta</button>
+                </form>
             </div>
-            <div class="form-control">
-                <label>Valor (R$)</label>
-                <input type="number" id="amount" placeholder="0,00" step="0.01" required />
-            </div>
-            <div class="form-control">
-                <label>Tipo</label>
-                <select id="type">
-                    <option value="receita">Receita (+)</option>
-                    <option value="despesa">Despesa (-)</option>
-                </select>
-            </div>
-            <button class="btn">Adicionar</button>
-        </form>
+        </div>
     </div>
 
     <script>
-        /* --- LÓGICA --- */
-        const list = document.getElementById('list');
-        const form = document.getElementById('form');
-        const text = document.getElementById('text');
-        const amount = document.getElementById('amount');
-        const typeSelect = document.getElementById('type');
-        const colorPicker = document.getElementById('bg-color-picker');
+        // Elementos
+        const transList = document.getElementById('trans-list');
+        const goalsContainer = document.getElementById('goals-container');
+        const balEl = document.getElementById('bal');
+        const incEl = document.getElementById('inc');
+        const expEl = document.getElementById('exp');
 
-        // --- FUNCIONALIDADE DE COR DE FUNDO ---
-        // Ao carregar, verifica se tem cor salva
-        const savedColor = localStorage.getItem('bgColor') || '#f3f4f6';
-        document.body.style.backgroundColor = savedColor;
-        colorPicker.value = savedColor;
-
-        // Ao mudar a cor no seletor
-        colorPicker.addEventListener('input', (e) => {
-            const newColor = e.target.value;
-            document.body.style.backgroundColor = newColor;
-            localStorage.setItem('bgColor', newColor);
-        });
-
-        // --- LÓGICA FINANCEIRA ---
+        // Estado
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let goals = JSON.parse(localStorage.getItem('goals')) || [];
 
-        function updateLocalStorage() {
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-        }
+        // --- TEMA ---
+        const bgPicker = document.getElementById('bg-picker');
+        bgPicker.value = localStorage.getItem('bgColor') || '#f3f4f6';
+        document.body.style.backgroundColor = bgPicker.value;
+        bgPicker.oninput = (e) => {
+            document.body.style.backgroundColor = e.target.value;
+            localStorage.setItem('bgColor', e.target.value);
+        };
 
-        function removeTransaction(id) {
-            transactions = transactions.filter(t => t.id !== id);
-            updateLocalStorage();
-            init();
-        }
-
-        function addTransactionDOM(transaction) {
-            const sign = transaction.amount < 0 ? '-' : '+';
-            const item = document.createElement('li');
-            item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
-
-            item.innerHTML = `
-                ${transaction.text} <span>${sign} ${Math.abs(transaction.amount).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</span>
-                <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
-            `;
-            list.appendChild(item);
-        }
-
-        function updateValues() {
-            const amounts = transactions.map(t => t.amount);
-            const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
-            const income = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0).toFixed(2);
-            const expense = (amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1).toFixed(2);
-
-            document.getElementById('balance').innerText = Number(total).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            document.getElementById('money-plus').innerText = `+ R$ ${Number(income).toLocaleString('pt-BR')}`;
-            document.getElementById('money-minus').innerText = `- R$ ${Number(expense).toLocaleString('pt-BR')}`;
-        }
-
-        function init() {
-            list.innerHTML = '';
-            transactions.forEach(addTransactionDOM);
-            updateValues();
-        }
-
-        form.addEventListener('submit', (e) => {
+        // --- TRANSAÇÕES ---
+        document.getElementById('trans-form').onsubmit = (e) => {
             e.preventDefault();
-            const val = typeSelect.value === 'despesa' ? -Math.abs(amount.value) : Math.abs(amount.value);
-            const transaction = { id: Date.now(), text: text.value, amount: val };
+            const text = document.getElementById('t-text').value;
+            const amt = document.getElementById('t-amount').value;
+            const type = document.getElementById('t-type').value;
             
-            transactions.push(transaction);
-            updateLocalStorage();
-            init();
-            text.value = ''; amount.value = '';
-        });
+            transactions.push({
+                id: Date.now(),
+                text,
+                amount: type === 'despesa' ? -Math.abs(amt) : Math.abs(amt)
+            });
+            update();
+            e.target.reset();
+        };
 
-        init();
+        // --- METAS ---
+        document.getElementById('goal-form').onsubmit = (e) => {
+            e.preventDefault();
+            goals.push({
+                id: Date.now(),
+                name: document.getElementById('g-name').value,
+                target: parseFloat(document.getElementById('g-target').value)
+            });
+            update();
+            e.target.reset();
+        };
+
+        function removeTrans(id) { transactions = transactions.filter(t => t.id !== id); update(); }
+        function removeGoal(id) { goals = goals.filter(g => g.id !== id); update(); }
+
+        // --- ATUALIZAÇÃO GERAL ---
+        function update() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            localStorage.setItem('goals', JSON.stringify(goals));
+
+            // Calcular Saldo
+            const amounts = transactions.map(t => t.amount);
+            const total = amounts.reduce((acc, i) => acc + i, 0);
+            const inc = amounts.filter(i => i > 0).reduce((acc, i) => acc + i, 0);
+            const exp = amounts.filter(i => i < 0).reduce((acc, i) => acc + i, 0);
+
+            balEl.innerText = total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            incEl.innerText = inc.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            expEl.innerText = Math.abs(exp).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+            // Render Transações
+            transList.innerHTML = '';
+            transactions.forEach(t => {
+                const li = document.createElement('li');
+                li.className = t.amount < 0 ? 'minus' : 'plus';
+                li.innerHTML = `${t.text} <span>${t.amount.toLocaleString('pt-BR')} <button class="delete-btn" onclick="removeTrans(${t.id})">x</button></span>`;
+                transList.appendChild(li);
+            });
+
+            // Render Metas
+            goalsContainer.innerHTML = '';
+            goals.forEach(g => {
+                const percent = Math.min((total / g.target) * 100, 100).toFixed(1);
+                const displayPercent = total > 0 ? (percent < 0 ? 0 : percent) : 0;
+                
+                const div = document.createElement('div');
+                div.className = 'goal-item';
+                div.innerHTML = `
+                    <div class="goal-info">
+                        <span>${g.name} <button class="delete-btn" onclick="removeGoal(${g.id})">🗑️</button></span>
+                        <span>${displayPercent}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${displayPercent}%; background: ${displayPercent >= 100 ? '#2ecc71' : '#3b82f6'}"></div>
+                    </div>
+                    <small style="display:block; margin-top:5px; color:#666">Alvo: R$ ${g.target.toLocaleString('pt-BR')}</small>
+                `;
+                goalsContainer.appendChild(div);
+            });
+        }
+
+        update();
     </script>
 </body>
 </html>
